@@ -22,7 +22,12 @@ body{
   transition:background 1.2s ease;
 }
 
-/* ESTRELLAS NOCTURNAS */
+/* FONDO NOCTURNO */
+body.night{
+  background:linear-gradient(180deg,#0b0c2a,#2c003e);
+}
+
+/* ESTRELLAS */
 body.night::after{
   content:'';
   position:fixed;
@@ -75,7 +80,7 @@ body.night::after{
   to{ transform:translateY(-120vh); opacity:0; }
 }
 
-/* FUEGOS ARTIFICIALES CON ESTELAS */
+/* FUEGOS ARTIFICIALES */
 .firework, .trail{
   position:fixed;
   border-radius:50%;
@@ -186,21 +191,25 @@ button{
   50%{ transform:translateY(-6px); }
 }
 
+/* MENSAJE FINAL */
 #thanks{
   display:none;
-  color:#a61e4d;
+  color:#b21f5d;
 }
 
 #thanks p{
-  font-size:15px;
+  font-size:16px;
+  line-height:1.7;
   margin-bottom:20px;
 }
 
+/* FIRMA */
 .signature{
   font-family:'Pacifico', cursive;
-  font-size:1.8rem;
+  font-size:2rem;
+  color:#d6336c;
   opacity:0;
-  animation:sign 4.2s ease forwards;
+  animation:sign 4.5s ease forwards;
 }
 
 @keyframes sign{
@@ -236,8 +245,7 @@ button{
 
     <div id="thanks">
       <p>
-        Gracias mi amor ❤️<br>
-        Esto significa mucho para mí y prometo esforzarme para hacerte muy feliz.
+        Gracias por tu ayuda ❤️<br>
       </p>
       <div class="signature">Tú Treintón</div>
     </div>
@@ -261,9 +269,14 @@ function updateCountdown(){
 setInterval(updateCountdown,1000);
 updateCountdown();
 
-// ABRIR CARTA + FONDO NOCTURNO
+// ABRIR CARTA + FONDO NOCTURNO + VIBRACIÓN
 function openLetter(){
   document.body.classList.add('night');
+  // FORZAR repaint para móviles
+  document.body.offsetHeight;
+  
+  if(navigator.vibrate){ navigator.vibrate(100); }
+  
   const env=document.getElementById('envelope');
   env.style.opacity='0';
   env.style.transform='scale(.8)';
@@ -315,7 +328,7 @@ setInterval(()=>{
   setTimeout(()=>c.remove(),7000);
 },800);
 
-// FUEGOS ARTIFICIALES + ESTELAS + VIBRACIÓN
+// FUEGOS ARTIFICIALES
 function launchFirework(){
   const x=Math.random()*window.innerWidth;
   const y=Math.random()*window.innerHeight*0.5;
@@ -336,7 +349,6 @@ function launchFirework(){
     document.body.appendChild(f);
     setTimeout(()=>f.remove(),1400);
 
-    // ESTELAS que caen suavemente
     const t=document.createElement('div');
     t.className='trail';
     t.style.left=(x+Math.cos(angle)*distance/2)+'px';
@@ -355,6 +367,8 @@ setInterval(launchFirework,2200);
 
 </body>
 </html>
+
+
 
 
 
