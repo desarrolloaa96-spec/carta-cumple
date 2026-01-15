@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Te ha llegado una carta 💌</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@300;400;500&family=Pacifico&display=swap" rel="stylesheet">
+
+<style>
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,#ffe9f0,#ffdbe7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  font-family:'Poppins', sans-serif;
+  transition:background 1.2s ease;
+}
+
+/* ESTRELLAS NOCTURNAS */
+body.night::after{
+  content:'';
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0; left:0;
+  background:transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="10" cy="20" r="1" fill="white"/><circle cx="50" cy="60" r="1" fill="white"/><circle cx="80" cy="10" r="1" fill="white"/><circle cx="30" cy="80" r="1" fill="white"/></svg>') repeat;
+  opacity:0.25;
+  pointer-events:none;
+}
+
+.container{
+  width:100%;
+  max-width:460px;
+  padding:20px;
+  text-align:center;
+}
+
+#title{
+  font-family:'Playfair Display', serif;
+  font-size:1.3rem;
+  color:#b21f5d;
+  margin-bottom:6px;
+}
+
+#countdown{
+  margin-bottom:25px;
+  color:#a61e4d;
+  font-weight:500;
+}
+
+.heart, .confetti{
+  position:fixed;
+  bottom:-20px;
+  animation:float 7s linear infinite;
+  opacity:.85;
+  pointer-events:none;
+}
+
+.heart{ font-size:18px; }
+
+.confetti{
+  width:8px;
+  height:8px;
+  border-radius:2px;
+}
+
+@keyframes float{
+  from{ transform:translateY(0); opacity:1; }
+  to{ transform:translateY(-120vh); opacity:0; }
+}
+
+/* FUEGOS ARTIFICIALES CON ESTELAS */
+.firework, .trail{
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.firework{
+  width:6px;
+  height:6px;
+  animation:explode 1.4s ease-out forwards;
+  box-shadow:0 0 8px rgba(255,255,255,0.9);
+}
+
+.trail{
+  width:4px;
+  height:4px;
+  opacity:0.8;
+  animation:fall 1.2s linear forwards;
+  filter:blur(1px);
+}
+
+@keyframes explode{
+  from{ transform:translate(0,0) scale(1); opacity:1; }
+  to{ transform:translate(var(--x), var(--y)) scale(.3); opacity:0; }
+}
+
+@keyframes fall{
+  from{ transform:translate(0,0); opacity:0.8; }
+  to{ transform:translate(var(--x), var(--y)) scale(.2); opacity:0; }
+}
+
+/* SOBRE */
+#envelope{
+  font-size:92px;
+  cursor:pointer;
+  animation:pulse 1.6s infinite;
+  transition:all .6s ease;
+}
+
+#envelope span{
+  display:block;
+  font-size:14px;
+  color:#d6336c;
+  margin-top:8px;
+}
+
+@keyframes pulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.1); }
+}
+
+/* CARTA */
+#letter{
+  display:none;
+  background:#fff;
+  border-radius:24px;
+  padding:28px 24px;
+  box-shadow:0 20px 45px rgba(0,0,0,.18);
+  animation:fadeUp .8s ease forwards;
+  max-height:75vh;
+  overflow-y:auto;
+}
+
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(30px) scale(.95); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+#letter h3{
+  font-family:'Playfair Display', serif;
+  font-size:1.4rem;
+  color:#d6336c;
+  margin-top:0;
+}
+
+#letter p{
+  font-size:15px;
+  line-height:1.6;
+  color:#444;
+}
+
+/* INPUT */
+textarea{
+  width:100%;
+  height:140px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  padding:12px;
+  resize:none;
+  font-size:14px;
+  margin-top:10px;
+}
+
+button{
+  margin-top:18px;
+  background:#d6336c;
+  color:#fff;
+  border:none;
+  padding:14px 28px;
+  border-radius:30px;
+  font-size:16px;
+  cursor:pointer;
+  animation:bounce 1.5s infinite;
+}
+
+@keyframes bounce{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-6px); }
+}
+
+#thanks{
+  display:none;
+  color:#a61e4d;
+}
+
+#thanks p{
+  font-size:15px;
+  margin-bottom:20px;
+}
+
+.signature{
+  font-family:'Pacifico', cursive;
+  font-size:1.8rem;
+  opacity:0;
+  animation:sign 4.2s ease forwards;
+}
+
+@keyframes sign{
+  from{ opacity:0; clip-path:inset(0 100% 0 0); }
+  to{ opacity:1; clip-path:inset(0 0 0 0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div id="title">Te ha llegado una carta 💌</div>
+  <div id="countdown"></div>
+
+  <div id="envelope" onclick="openLetter()">
+    💌
+    <span>Toca para abrir</span>
+  </div>
+
+  <div id="letter">
+    <div id="content">
+      <h3>Mi chiquita ❤️</h3>
+      <p>
+        Nuevamente ya casi es tu cumpleaños y quiero que me ayudes con algo muy especial.<br><br>
+        Escríbeme <strong>50 opciones de regalos</strong>, sin importar el precio,
+        recuerda que no soy millonario… todavía 😅💸
+      </p>
+
+      <textarea id="giftText" placeholder="Empieza a escribir aquí tus opciones..."></textarea>
+      <button onclick="sendForm()">Enviar 🎁</button>
+    </div>
+
+    <div id="thanks">
+      <p>
+        Gracias mi amor ❤️<br>
+        Esto significa mucho para mí y prometo esforzarme para hacerte muy feliz.
+      </p>
+      <div class="signature">Tú Treintón</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// CONTADOR
+function updateCountdown(){
+  const now=new Date();
+  let y=now.getFullYear();
+  let b=new Date(y,5,9);
+  if(now>b) b.setFullYear(y+1);
+  let d=b-now;
+  countdown.innerText=
+    `Faltan ${Math.floor(d/86400000)} días `+
+    `${Math.floor(d/3600000%24)}h `+
+    `${Math.floor(d/60000%60)}m `+
+    `${Math.floor(d/1000%60)}s 🎂`;
+}
+setInterval(updateCountdown,1000);
+updateCountdown();
+
+// ABRIR CARTA + FONDO NOCTURNO
+function openLetter(){
+  document.body.classList.add('night');
+  const env=document.getElementById('envelope');
+  env.style.opacity='0';
+  env.style.transform='scale(.8)';
+  setTimeout(()=>{
+    env.style.display='none';
+    document.getElementById('letter').style.display='block';
+  },600);
+}
+
+// ENVIAR FORM
+function sendForm(){
+  const text=document.getElementById('giftText').value.trim();
+  if(!text){
+    alert("Escribe al menos una opción ❤️");
+    return;
+  }
+
+  fetch(
+    "https://docs.google.com/forms/d/e/1FAIpQLSeEG02JJIAB8cJYMJ8ApwPWfrOGHnwVNXZO4Q_v1BRx0ZG6mg/formResponse",
+    {
+      method:"POST",
+      mode:"no-cors",
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:"entry.1636345326="+encodeURIComponent(text)
+    }
+  );
+
+  document.getElementById('content').style.display='none';
+  document.getElementById('thanks').style.display='block';
+}
+
+// CORAZONES
+setInterval(()=>{
+  const h=document.createElement('div');
+  h.className='heart';
+  h.innerText='❤️';
+  h.style.left=Math.random()*100+'vw';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},600);
+
+// CONFETI
+setInterval(()=>{
+  const c=document.createElement('div');
+  c.className='confetti';
+  c.style.left=Math.random()*100+'vw';
+  c.style.background=['#ffd166','#ffcad4','#fff'][Math.floor(Math.random()*3)];
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),7000);
+},800);
+
+// FUEGOS ARTIFICIALES + ESTELAS + VIBRACIÓN
+function launchFirework(){
+  const x=Math.random()*window.innerWidth;
+  const y=Math.random()*window.innerHeight*0.5;
+  const colors=['#ff6f91','#ffc2d1','#ffd166','#ff8fab'];
+
+  for(let i=0;i<20;i++){
+    const f=document.createElement('div');
+    f.className='firework';
+    f.style.left=x+'px';
+    f.style.top=y+'px';
+    f.style.background=colors[Math.floor(Math.random()*colors.length)];
+
+    const angle=Math.random()*2*Math.PI;
+    const distance=60+Math.random()*60;
+    f.style.setProperty('--x',Math.cos(angle)*distance+'px');
+    f.style.setProperty('--y',Math.sin(angle)*distance+'px');
+
+    document.body.appendChild(f);
+    setTimeout(()=>f.remove(),1400);
+
+    // ESTELAS que caen suavemente
+    const t=document.createElement('div');
+    t.className='trail';
+    t.style.left=(x+Math.cos(angle)*distance/2)+'px';
+    t.style.top=(y+Math.sin(angle)*distance/2)+'px';
+    t.style.background=colors[Math.floor(Math.random()*colors.length)];
+    t.style.setProperty('--x',(Math.random()-0.5)*20+'px');
+    t.style.setProperty('--y',50+Math.random()*50+'px');
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(),1200);
+  }
+
+  if(navigator.vibrate){ navigator.vibrate(60); }
+}
+setInterval(launchFirework,2200);
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
